@@ -7,40 +7,15 @@ function subpage_links() {
     global $post;
 
     $li = '';
-    $is_news = 'post' == get_post_type();
-    $news_page = get_news_page();
     $is_page = (
            'page' == get_post_type()
-        || 'flavor' == get_post_type()
-        || $is_news
     );
-    $soda_page = get_find_soda_page();
-    $flavors = array();
 
     // bail.
     if(!$is_page)
         return false;
 
     $parent = get_top_parent($post);
-
-    if($is_news) {
-        $parent = get_top_parent($news_page);
-    }
-
-    /**
-     * Add the floavor pages to the sidebar
-     * ------- */
-    if(
-           'flavor' == get_post_type()
-        || $parent->ID == $soda_page->ID
-        ) {
-        $parent = get_top_parent(get_find_soda_page());
-        $flavors = get_posts( array( 
-            'posts_per_page' => -1,
-            'post_type' => 'flavor',
-            'orderby' => 'menu_order',
-            ));
-    }
 
     $children = get_posts(array(
         'post_type' => 'page',
@@ -50,14 +25,9 @@ function subpage_links() {
         'post_parent' => $parent->ID
     ));
 
-    foreach (array_merge($flavors, $children) as $child) {
+    foreach (array_merge($children) as $child) {
         $class = (
-                    (
-                    // Highlight the "Blog" item on a single page
-                            $is_news
-                        && $news_page->ID == $child->ID
-                    )
-                || $post->ID == $child->ID
+                $post->ID == $child->ID
                 ) ? 'current-menu-item' : '';
 
 
